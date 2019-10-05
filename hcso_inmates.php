@@ -57,12 +57,9 @@ if ($result) {
 	die("Unable to get the inmate ID's from the website");
 }
 
+do_population_analysis();
+
 curl_close($ch);
-
-return;
-
-$html = file_get_contents("inmates/1697217.html");
-process_inmate_details($html);
 
 return;
 
@@ -297,6 +294,29 @@ function convert_date_to_mysql($dateString) {
 	$datetime = gmdate('Y-m-d H:i:s', strtotime($dateString));
 
 	return $datetime;
+}
+
+function do_population_analysis() {
+	global $hostname, $username, $password, $database;
+	// do an analysis of the inmate population at the time of the parsing
+	// to determine if there's a trend in what age/race/offenses are more likely
+	// to be released
+
+	$conn = mysqli_connect($hostname, $username, $password, $database);
+	if (!$conn) {
+		die("Connection to MySQL Server on {$hostname} failed\n");
+	}
+
+	$sql = "insert into dm_inmate_population (date, population, admitted_date, sex, race)
+			select left(now(), 10), count(*), left(admitted_date, 10), sex, race
+			from inmate_information
+			group by left(admitted_date, 10), sex, race;";
+
+	if (mysqli_query($conn, $sql)) {
+		echo "Datamart updated successfully\n\n";
+	} else {
+		echo "Error: " . $sql . PHP_EOL . mysqli_error($conn);
+	}
 }
 
 function set_inmates_as_inactive() {

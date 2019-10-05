@@ -1,5 +1,5 @@
 <?php
-
+require_once('credentials.php');
 /*
 *	Get all of the current inmates via the btnViewAll object in the DOM
 */
@@ -300,11 +300,8 @@ function convert_date_to_mysql($dateString) {
 }
 
 function set_inmates_as_inactive() {
-	$hostname = "localhost";
-	$username = "root";
-	$password = "fullnelson1@";
-	$database = "inmates";
-
+	global $hostname, $username, $password, $database;
+	
 	$now = date("Y-m-d H:i:s");
 	$last_inmate_id = null;
 
@@ -328,10 +325,7 @@ function convert_datetime_to_mysql($dateTimeString) {
 }
 
 function write_inmate_data_to_database($dataArray) {
-	$hostname = "localhost";
-	$username = "root";
-	$password = "fullnelson1@";
-	$database = "inmates";
+	global $hostname, $username, $password, $database;
 
 	$now = date("Y-m-d H:i:s");
 	$last_inmate_id = null;
